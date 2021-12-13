@@ -4,33 +4,59 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PDF Viewer in jQuery brad</title>
+    <title>PDF Viewer in jQuery</title>
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-      integrity="sha512-YWzhKL2whUzgiheMoBFwW8CKV4qpHQAEuvilg9FAn5VJUDwKZZxkJNuGM4XkWuk94WCrrwslk8yWNGmY1EduTA=="
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+      integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA=="
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <div class="top-bar">
-      <button class="btn" id="prev-page">
-        <i class="fas fa-arrow-circle-left"></i> Prev Page
-      </button>
-      <button class="btn" id="next-page">
-        Next Page<i class="fas fa-arrow-circle-right"></i>
-      </button>
+    <header>
+      <ul class="navigation">
+        <li class="navigation__item">
+          <!-- page 1 of 5 -->
+          <a href="#" class="previous round" id="prev-page"
+            ><i class="fas fa-arrow-left"></i
+          ></a>
+          <span id="page-num">1</span>
+          <a href="#" class="next round" id="next-page"
+            ><i class="fas fa-arrow-right"></i
+          ></a>
+          of <span id="page-count">1</span>
+        </li>
+        <li class="navigation__item">
+          <label for="fileUpload" class="custom-file-upload" id="openPDF">
+            Open PDF
+          </label>
+          <input id="fileUpload" type="file" />
+        </li>
 
-      <!-- page 1 of 5 -->
-      <span class="page-info">
-        Page <span id="page-num">1</span> of <span id="page-count">1</span>
-      </span>
-    </div>
+        <li class="navigation__item">
+          <!-- <span id="zoomValue">100%</span>
+          <input
+            type="range"
+            id="zoom"
+            min="50"
+            max="300"
+            value="150"
+            step="50"
+          /> -->
+          <a href="#" class="zoom" id="zoom_in">
+            <i class="fas fa-search-plus"></i>
+          </a>
+          <a href="#" class="zoom" id="zoom_out">
+            <i class="fas fa-search-minus"></i>
+          </a>
+        </li>
+      </ul>
+    </header>
 
     <!-- canvas to place the PDF -->
-    <canvas id="pdf-render">
+    <canvas id="canvas" class="canvas__container">
       Your browser does not support the HTML5 canvas tag.
     </canvas>
     <!-- jQuery CDN -->
