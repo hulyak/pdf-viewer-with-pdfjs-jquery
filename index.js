@@ -30,7 +30,7 @@ const renderPage = () => {
   });
 };
 
-// 1. Get Document
+//  Get Document
 pdfjsLib
   .getDocument($pdf)
   .promise.then(function (doc) {
@@ -100,10 +100,19 @@ $('#zoom_out').on('click', function () {
   renderPage();
 });
 
+$('#openPDF').on('click', () => {
+  $('#file_upload').click();
+});
+
 // open a new PDF file
 $('#file_upload').on('change', function (e) {
-  console.log('clicked');
-  var file = e.target.files[0];
-  fileReader.readAsArrayBuffer(file);
-  renderPage();
+  if (inputFile.type == 'application/pdf') {
+    const reader = new FileReader();
+    reader.readAsDataURL(inputFile);
+    reader.onload = () => {
+      renderPage();
+    };
+  } else {
+    alert('The file you are trying to open is not a pdf file!');
+  }
 });
