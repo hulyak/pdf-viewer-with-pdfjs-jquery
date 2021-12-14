@@ -1,101 +1,109 @@
-const url = 'document.pdf';
+const $pdf = 'document.pdf';
 
-let $pdfDoc = null,
-  $pageNum = 1,
-  $pageIsRendering = false,
-  $pageNumIsPending = null;
-
-const $scale = 1.5;
-
-$('#zoom').on('input', function () {
-  // this #zoom
-  $('#zoomValue').text($('#zoom').val() + '%');
-  $pdfDoc.scale = parseInt($('#zoom').val()) / 100;
-  queueRenderPage($pdfDoc);
-});
+let $initialState = {
+  pdfDoc: null,
+  currentPage: 1,
+  pageCount: 0,
+  zoom: 1,
+};
 
 // Render the page
-const renderPage = (num) => {
-  $pageIsRendering = true;
+const renderPage = () => {
+  // load the first page
+  $initialState.pdfDoc.getPage($initialState.currentPage).then(function (page) {
+    const canvas = $('#canvas')[0];
+    const $ctx = canvas.getContext('2d');
+    const $viewport = page.getViewport({ scale: $initialState.zoom });
 
-  $pdfDoc.getPage(num).then((page) => {
-    console.log('page', page);
-    const $ctx = $('#canvas')[0].getContext('2d');
-    const $viewport = page.getViewport({ scale: $scale });
-    $('#canvas')[0].height = $viewport.height;
-    $('#canvas')[0].width = $viewport.width;
+    canvas.height = $viewport.height;
+    canvas.width = $viewport.width;
 
+    // Render PDF page into canvas context
     const renderCtx = {
       canvasContext: $ctx,
       viewport: $viewport,
     };
 
-    page.render(renderCtx).promise.then(() => {
-      $pageIsRendering = false;
+    page.render(renderCtx);
 
-      if ($pageNumIsPending !== null) {
-        renderPage($pageNumIsPending);
-        $pageNumIsPending = null;
-      }
-    });
-
-    $('#page-num').html(num);
+    $('#page_num').html($initialState.currentPage);
   });
 };
 
-// Check for pages rendering
-const queueRenderPage = (num) => {
-  if ($pageIsRendering) {
-    $pageNumIsPending = num;
-  } else {
-    renderPage(num);
-  }
-};
-
 // 1. Get Document
-function getDocument() {
-  pdfjsLib
-    .getDocument(url)
-    .promise.then((pdfDoc_) => {
-      $pdfDoc = pdfDoc_;
-      console.log('pdfDocument', $pdfDoc);
-      $('#page-count').html($pdfDoc.numPages);
+pdfjsLib
+  .getDocument($pdf)
+  .promise.then(function (doc) {
+    $initialState.pdfDoc = doc;
+    console.log('pdfDocument', $initialState.pdfDoc);
 
-      renderPage($pageNum);
-    })
-    .catch((err) => {
-      alert(err.message);
-    });
+    $('#page_count').html($initialState.pdfDoc.numPages);
+
+    renderPage();
+  })
+  .catch(function (err) {
+    alert(err.message);
+  });
+
+function showPrevPage() {
+  if ($initialState.pdfDoc === null || $initialState.currentPage <= 1) return;
+  $initialState.currentPage--;
+  // render the current page
+  $('#current_page').val($initialState.currentPage);
+  renderPage();
 }
 
-const showPrevPage = () => {
-  if ($pageNum <= 1) {
+function showNextPage() {
+  if (
+    $initialState.pdfDoc === null ||
+    $initialState.currentPage >= $initialState.pdfDoc._pdfInfo.numPages // comes from pdf.js
+  )
     return;
-  }
-  $pageNum--;
-  queueRenderPage($pageNum);
-};
 
-const showNextPage = () => {
-  if ($pageNum >= $pdfDoc.numPages) {
-    return;
-  }
-  $pageNum++;
-  queueRenderPage($pageNum);
-};
+  $initialState.currentPage++;
+  $('#current_page').val($initialState.currentPage);
+  renderPage();
+}
 
 // Button Events
 $('#prev-page').click(showPrevPage);
 $('#next-page').click(showNextPage);
 
-// open a new PDF file
-$('#fileUpload').on('change', function (e) {
-  const $file = e.target.files[0];
-  const $reader = new FileReader();
-  $reader.readAsDataURL($file);
-  $reader.onload = function () {
-    getDocument($reader.result);
-  };
+$('#current_page').on('keypress', function (event) {
+  if ($initialState.pdfDoc === null) return;
+  // get the key code
+  const $keycode = event.keyCode ? event.keyCode : event.which;
+
+  if ($keycode === 13) {
+    // enter key
+    // get the new page number and render it
+    let desiredPage = $('#current_page')[0].valueAsNumber;
+    if (
+      desiredPage >= 1 &&
+      desiredPage <= $initialState.pdfDoc._pdfInfo.numPages // between the ranges of PDF pages
+    ) {
+      $initialState.currentPage = desiredPage;
+      renderPage();
+    }
+  }
 });
 
-getDocument();
+$('#zoom_in').on('click', function () {
+  if ($initialState.pdfDoc === null) return;
+  $initialState.zoom += 0.5;
+  renderPage();
+});
+
+$('#zoom_out').on('click', function () {
+  if ($initialState.pdfDoc === null) return;
+  $initialState.zoom -= 0.5;
+  renderPage();
+});
+
+// open a new PDF file
+$('#file_upload').on('change', function (e) {
+  console.log('clicked');
+  var file = e.target.files[0];
+  fileReader.readAsArrayBuffer(file);
+  renderPage();
+});

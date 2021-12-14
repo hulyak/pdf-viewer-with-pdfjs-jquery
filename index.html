@@ -22,35 +22,32 @@
           <a href="#" class="previous round" id="prev-page"
             ><i class="fas fa-arrow-left"></i
           ></a>
-          <span id="page-num">1</span>
+
+          <input type="number" value="1" id="current_page" />
+
           <a href="#" class="next round" id="next-page"
             ><i class="fas fa-arrow-right"></i
           ></a>
-          of <span id="page-count">1</span>
-        </li>
-        <li class="navigation__item">
-          <label for="fileUpload" class="custom-file-upload" id="openPDF">
-            Open PDF
-          </label>
-          <input id="fileUpload" type="file" />
+
+          Page <span id="page_num"></span> of
+          <span id="page_count"></span>
         </li>
 
         <li class="navigation__item">
-          <!-- <span id="zoomValue">100%</span>
-          <input
-            type="range"
-            id="zoom"
-            min="50"
-            max="300"
-            value="150"
-            step="50"
-          /> -->
-          <a href="#" class="zoom" id="zoom_in">
+          <label for="file_upload" class="custom-file-upload" id="openPDF">
+            Open PDF
+          </label>
+          <input id="file_upload" type="file" />
+        </li>
+
+        <li class="navigation__item">
+          <button class="zoom" id="zoom_in">
             <i class="fas fa-search-plus"></i>
-          </a>
-          <a href="#" class="zoom" id="zoom_out">
+          </button>
+
+          <button class="zoom" id="zoom_out">
             <i class="fas fa-search-minus"></i>
-          </a>
+          </button>
         </li>
       </ul>
     </header>
